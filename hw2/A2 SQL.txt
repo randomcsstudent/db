@@ -1,0 +1,209 @@
+**
+Homework 2 [SQL]
+600.315
+
+/* Not using any JOINs, as directed in class. */
+/* Note: sometimes when I copy and paste my queries into terminal (where I am ssh-ing into my ugrad account to then run mysql), syntax errors pop up. These errors will not appear when I manually type in the query. I assume this is because of different text editors.*/ 
+
+1. 
+SELECT S.Fname, S.Lname, S.Major, S.Sex
+FROM Student S, Likes L
+WHERE S.StuID = L.WhoLikes
+GROUP BY StuID
+HAVING COUNT(L.WhoIsLiked) = (
+	SELECT COUNT(StuID)
+	FROM Student
+	);
+
+2. 
+(SELECT DISTINCT S.Fname, S.Lname, S.Sex
+FROM Student S, Enrolled_in E, Course C, Department D
+WHERE D.DName =“Computer Science” and
+	C.DNO = D.DNO and
+	C.CID = E.CID and
+	E.StuID = S.StuID)
+UNION
+(SELECT F.Fname, F.Lname, F.Sex
+FROM Faculty F, Course C, Department D
+WHERE D.DName =“Computer Science” and
+	C.DNO = D.DNO and
+	C.Instructor = F.FacID);
+
+
+3.
+SELECT S.Fname, S.Lname, S.Age, S.Sex
+FROM Student S, Lives_in L
+WHERE S.StuID = L.stuid
+GROUP BY L.room_number
+HAVING COUNT(L.stuid) = 1;
+
+4.
+SELECT S.Fname, S.Lname, S.Age, S.Major, SUM(C.Credits) as Credits
+FROM Student S, Enrolled_in E, Course C
+WHERE E.CID = C.CID and
+	E.StuID = S.StuID
+GROUP BY S.StuID;
+
+5.
+SELECT S.Fname, S.Lname, S.Major
+FROM Student S, Enrolled_in E, Course C
+WHERE E.CID = C.CID and
+	E.StuID = S.StuID
+GROUP BY S.StuID
+HAVING SUM(C.Credits) > 20;
+
+>>>6.
+Faculty, Student, Enrolled_in, Lives_in, Minor_in
+select *
+from Faculty F, (
+	select * 
+	from Student S, Student T (
+		
+
+select * from Student S, Faculty F, Enrolled_in E, Lives_in L where S.Advisor = F.FacID and S.StuID = E.StuID and S.StuID = L.StuID group by room_number;
+
+//how to nest
+
+>>>10.
+
+17.
+SELECT S.Fname, S.Lname, S.Sex, count(L.WhoLikes) as Likers
+FROM Student S, Likes L
+WHERE S.StuID = L.WhoIsLiked
+GROUP BY S.StuID
+ORDER BY count(L.WhoLikes) DESC
+LIMIT 1;
+
+19.
+/* I am assuming ‘division’ means ‘department’, of which there are four [in the database]. */
+
+SELECT D.DName, count(*) as TotalEnrollment
+FROM Department D, Course C, Enrolled_in E
+WHERE D.DNo = C.DNo and
+	C.CID = E.CID
+GROUP BY D.DNo;
+
+>>>20.
+
+21.
+SELECT D.DName, count(*) as TotalEnrollment
+FROM Department D, Course C, Enrolled_in E
+WHERE D.DNo = C.DNo and
+	C.CID = E.CID
+GROUP BY D.DNo
+ORDER BY TotalEnrollment ASC
+LIMIT 1;
+
+23.
+“For each student who plays a sport, raise all of their letter grades by 1 increment (B to B+, B+ to A-). Then print their new GPAs (in a separate query).”
+/* Printing just the sports players’ GPAs. For clarity, printing sports players’ Student ID number too.*/
+
+SELECT DISTINCT U.StuID, round(sum(U.updated * C.Credits) / sum(C.Credits),2) AS GPA 
+FROM ( 
+	(SELECT *, round(G.gradepoint+.3,1) AS updated  
+	FROM Enrolled_in E, Gradeconversion G  
+	WHERE Grade like "%-%" and E.Grade = G.lettergrade) 
+	UNION 
+	(SELECT *, round(G.gradepoint+.4,1) AS updated 
+	FROM Enrolled_in E, Gradeconversion G 
+	WHERE E.Grade like "%+%" and E.Grade NOT LIKE "%A%" and E.Grade = G.lettergrade) 
+	UNION 
+	(SELECT *, round(G.gradepoint+.3,1) AS updated 
+	FROM Enrolled_in E, Gradeconversion G 
+	WHERE E.Grade NOT LIKE "%+%" and E.Grade NOT LIKE "%-%" and G.gradepoint < 4 and E.Grade = G.lettergrade) 
+	UNION 
+	(SELECT *, G.gradepoint 
+	FROM Enrolled_in E, Gradeconversion G 
+	WHERE G.gradepoint = 4 and E.Grade = G.lettergrade)) AS U, Course C, SportsInfo S WHERE U.CID = C.CID and
+	S.StuID = U.StuID 
+GROUP BY U.StuID;
+
+24.
+/* “Subjects” I assume to be different courses. */
+
+SELECT S.Fname, S.Lname
+FROM Student S, Has_Allergy A, Enrolled_in E 
+WHERE S.StuID = A.StuID and S.StuID = E.StuID 
+GROUP BY E.StuID 
+HAVING COUNT(E.CID) > 3;
+
+>>>25.
+Average GPA for students playing each sport?
+/* Assuming we want an average of GPA of all students that play each sport. */
+
+/* need 7 more from here! */ 
+
+26.
+(SELECT S.SportName, S.HoursPerWeek
+FROM SportsInfo S
+ORDER BY S.HoursPerWeek ASC
+LIMIT 1)
+UNION
+(SELECT S.SportName, S.HoursPerWeek
+FROM SportsInfo S
+ORDER BY S.HoursPerWeek DESC
+LIMIT 1);
+
+27. 
+SELECT 
+	(SELECT AVG(gamesplayed) AS avgGamesPlayed 
+	FROM SportsInfo 
+	WHERE OnScholarship = 'Y') - 
+	(SELECT AVG(gamesplayed) AS avgGamesPlayed 
+	FROM SportsInfo WHERE onscholarship = 'N') AS Difference;
+
+29.
+SELECT (sportsEarly * 100 / earlyRisers) AS Percentage 
+FROM (
+	SELECT count(*) AS earlyRisers 
+	FROM Preferences P 
+	WHERE P.SleepHabits = "EarlyRiser") 
+AS EarlyRisers, 
+	(SELECT count(*) AS sportsEarly 
+	FROM SportsInfo S, Preferences P 
+	WHERE S.StuID = P.StuID AND P.SleepHabits = "EarlyRiser") 
+AS SportsEarly;
+
+30.
+SELECT count(*) AS numAmenities, D.gender 
+FROM (
+	SELECT dormid 
+	FROM SportsInfo S, Lives_in L 
+	WHERE S.StuID = L.stuid 
+	GROUP BY L.dormid 
+	ORDER BY COUNT(distinct S.StuID) DESC 
+	LIMIT 1) 
+AS mostSports, Has_amenity H, Dorm D 
+WHERE H.dormid = mostSports.dormid AND H.dormid = D.dormid;
+
+
+32.
+/* Including the Department Name for sake of clarity. */
+
+SELECT D.DName, count(distinct H.StuID) AS Result 
+FROM Has_Allergy H, Preferences P, Student S, Department D 
+WHERE H.StuID = P.StuID AND P.Smoking = "Yes" AND H.StuID NOT IN (
+	SELECT S.StuID 
+	FROM SportsInfo S) AND H.StuID = S.StuID AND S.Major = D.DNo 
+GROUP BY D.DNo;
+
+34.
+SELECT S.Fname, S.Lname
+FROM Student S, Likes L
+WHERE S.StuID = L.WhoIsLiked
+GROUP BY S.StuID
+ORDER BY count(L.WhoLikes) DESC
+LIMIT 1;
+
+35.
+SELECT C.CName, COUNT(DISTINCT E.StuID) AS numPlayers 
+FROM Course C, Enrolled_in E 
+WHERE C.CID = E.CID and E.StuID IN 
+	(SELECT StuID 
+	FROM Plays_Games 
+	GROUP BY StuID 
+	HAVING SUM(Hours_Played) > 50) 
+GROUP BY C.CName 
+ORDER BY numPlayers DESC;
+
+

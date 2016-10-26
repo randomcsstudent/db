@@ -1,0 +1,358 @@
+MySQL [cs41515_**_db]> \. /home/**/2a.sql
++---------+-------+-------+------+
+| Fname   | Lname | Major | Sex  |
++---------+-------+-------+------+
+| William | Simms |   550 | M    |
++---------+-------+-------+------+
+1 row in set (0.00 sec)
+
++-----------+--------------+------+
+| Fname     | Lname        | Sex  |
++-----------+--------------+------+
+| Linda     | Smith        | F    |
+| Tracy     | Kim          | F    |
+| Shiela    | Jones        | F    |
+| Dinesh    | Kumar        | M    |
+| Paul      | Gompers      | M    |
+| Andy      | Schultz      | M    |
+| Lisa      | Apap         | F    |
+| Jandy     | Nelson       | F    |
+| Derek     | Lee          | M    |
+| David     | Adams        | M    |
+| Steven    | Davis        | M    |
+| Charles   | Norris       | M    |
+| Susan     | Lee          | F    |
+| Mark      | Schwartz     | M    |
+| Bruce     | Wilson       | M    |
+| Michael   | Leighton     | M    |
+| Arthur    | Pang         | M    |
+| Ian       | Thornton     | M    |
+| George    | Andreou      | M    |
+| Michael   | Woods        | M    |
+| David     | Shieber      | M    |
+| Stacy     | Prater       | F    |
+| Mark      | Goldman      | M    |
+| Eric      | Pang         | M    |
+| Paul      | Brody        | M    |
+| Eric      | Rugh         | M    |
+| Jun       | Han          | M    |
+| Lisa      | Cheng        | F    |
+| Sarah     | Smith        | F    |
+| Eric      | Brown        | M    |
+| William   | Simms        | M    |
+| Eric      | Epp          | M    |
+| Sarah     | Schmidt      | F    |
+| Louis     | Beach        | M    |
+| Joanne    | Houlahan     | F    |
+| Stacey    | Jones        | F    |
+| Michael   | Goodrich     | M    |
+| Arthur    | Delcher      | M    |
+| Rao       | Kosaraju     | M    |
+| David     | Yarowsky     | M    |
+| Gerald    | Masson       | M    |
+| Yair      | Amir         | M    |
+| Baruch    | Awerbuch     | M    |
+| Russell   | Taylor       | M    |
+| Ellie     | Angelopoulou | F    |
+| Eric      | Brill        | M    |
+| Alexander | Kaplan       | M    |
+| Subodh    | Kumar        | M    |
++-----------+--------------+------+
+48 rows in set (0.10 sec)
+
++---------+----------+------+------+
+| Fname   | Lname    | Age  | Sex  |
++---------+----------+------+------+
+| William | Simms    |   18 | M    |
+| Eric    | Rugh     |   20 | M    |
+| David   | Adams    |   22 | M    |
+| Lisa    | Apap     |   18 | F    |
+| Stacy   | Prater   |   18 | F    |
+| Michael | Woods    |   17 | M    |
+| Paul    | Brody    |   18 | M    |
+| Dinesh  | Kumar    |   20 | M    |
+| Michael | Leighton |   20 | M    |
+| Mark    | Schwartz |   17 | M    |
+| Bruce   | Wilson   |   27 | M    |
+| Eric    | Tai      |   19 | M    |
+| Jandy   | Nelson   |   20 | F    |
+| Jun     | Han      |   17 | M    |
++---------+----------+------+------+
+14 rows in set (0.00 sec)
+
++---------+----------+------+-------+---------+
+| Fname   | Lname    | Age  | Major | Credits |
++---------+----------+------+-------+---------+
+| Linda   | Smith    |   18 |   600 |      16 |
+| Tracy   | Kim      |   19 |   600 |      17 |
+| Shiela  | Jones    |   21 |   600 |      15 |
+| Dinesh  | Kumar    |   20 |   600 |      19 |
+| Paul    | Gompers  |   26 |   600 |      11 |
+| Andy    | Schultz  |   18 |   600 |      17 |
+| Lisa    | Apap     |   18 |   600 |      19 |
+| Jandy   | Nelson   |   20 |   600 |      15 |
+| Eric    | Tai      |   19 |   600 |      26 |
+| Derek   | Lee      |   17 |   600 |      23 |
+| David   | Adams    |   22 |   600 |      20 |
+| Steven  | Davis    |   20 |   600 |      16 |
+| Charles | Norris   |   18 |   600 |      21 |
+| Susan   | Lee      |   16 |   600 |      14 |
+| Mark    | Schwartz |   17 |   600 |      23 |
+| Bruce   | Wilson   |   27 |   600 |      19 |
+| Michael | Leighton |   20 |   600 |      17 |
+| Arthur  | Pang     |   18 |   600 |      11 |
+| Ian     | Thornton |   22 |   520 |      15 |
+| George  | Andreou  |   19 |   520 |      23 |
+| Michael | Woods    |   17 |   540 |      27 |
+| David   | Shieber  |   20 |   520 |      24 |
+| Stacy   | Prater   |   18 |   540 |      27 |
+| Mark    | Goldman  |   18 |   520 |      26 |
+| Eric    | Pang     |   19 |   520 |      16 |
+| Paul    | Brody    |   18 |   520 |      19 |
+| Eric    | Rugh     |   20 |   550 |      16 |
+| Jun     | Han      |   17 |   100 |      20 |
+| Lisa    | Cheng    |   21 |   550 |      26 |
+| Sarah   | Smith    |   20 |   550 |      13 |
+| Eric    | Brown    |   20 |   550 |      15 |
+| William | Simms    |   18 |   550 |      15 |
+| Eric    | Epp      |   18 |    50 |      16 |
+| Sarah   | Schmidt  |   26 |    50 |      16 |
++---------+----------+------+-------+---------+
+34 rows in set (0.28 sec)
+
++---------+----------+-----------------------+
+| Fname   | Lname    | DName                 |
++---------+----------+-----------------------+
+| Eric    | Tai      | Computer Science      |
+| Derek   | Lee      | Computer Science      |
+| Charles | Norris   | Computer Science      |
+| Mark    | Schwartz | Computer Science      |
+| George  | Andreou  | ECE                   |
+| Michael | Woods    | Chemical Engineering  |
+| David   | Shieber  | ECE                   |
+| Stacy   | Prater   | Chemical Engineering  |
+| Mark    | Goldman  | ECE                   |
+| Lisa    | Cheng    | Mathematical Sciences |
++---------+----------+-----------------------+
+10 rows in set (0.31 sec)
+
++-----------------------------------------+--------+-----------------+------------+-----------+--------------+
+| CName                                   | B_less | totalEnrollment | Percentage | Fname     | Lname        |
++-----------------------------------------+--------+-----------------+------------+-----------+--------------+
+| ALGORITHMS I                            |      7 |              11 |    63.6364 | Baruch    | Awerbuch     |
+| APPLIED STATISTICS AND DATA ANALYSIS    |      4 |               6 |    66.6667 | Daniel    | Naiman       |
+| CIRCUITS                                |      1 |               5 |    20.0000 | Richard   | Joseph       |
+| COGNITIVE NEUROSCIENCE                  |      3 |               3 |   100.0000 | Brenda    | Rapp         |
+| COMBINATORIAL ANALYSIS                  |      4 |               9 |    44.4444 | Lenore    | Cowen        |
+| COMP. MODELS OF SENTENCE PROCESSING     |      0 |               2 |     0.0000 | Robert    | Frank        |
+| COMPUTER SYSTEM FUNDAMENTALS            |      2 |               7 |    28.5714 | Gerald    | Masson       |
+| COMPUTER VISION                         |      4 |               8 |    50.0000 | Ellie     | Angelopoulou |
+| CONTROL SYSTEMS                         |      1 |               3 |    33.3333 | Pablo     | Iglesias     |
+| DATA STRUCTURES in JAVA                 |      3 |              11 |    27.2727 | Michael   | Goodrich     |
+| DATABASE SYSTEMS                        |     11 |              21 |    52.3810 | David     | Yarowsky     |
+| DISTRIBUTED SYSTEMS                     |      7 |              14 |    50.0000 | Yair      | Amir         |
+| ECE LABORATORY                          |      2 |               3 |    66.6667 | Frederic  | Davidson     |
+| EXPLORING THE INTERNET                  |      3 |               6 |    50.0000 | Louis     | Beach        |
+| FORMAL METHODS IN COGNITIVE SCIENCE     |      2 |               2 |   100.0000 | Luigi     | Burzio       |
+| FOUNDATIONS OF OPTIMIZATION             |      1 |               1 |   100.0000 | Jong-Shi  | Pang         |
+| HIGH PERFORMANCE GRAPHICS AND MODELING  |      2 |               2 |   100.0000 | Subodh    | Kumar        |
+| INTRO TO NATURAL LANGUAGE PROCESSING    |      5 |               9 |    55.5556 | Eric      | Brill        |
+| INTRO TO PROGRAMMING IN C/C++           |      1 |               2 |    50.0000 | Joanne    | Houlahan     |
+| INTRO TO PROGRAMMING IN JAVA            |      5 |              12 |    41.6667 | Stacey    | Jones        |
+| INTRODUCTION TO COMPUTER SCIENCE        |      1 |               2 |    50.0000 | Joanne    | Houlahan     |
+| INTRODUCTION TO PROBABILITY             |      6 |              13 |    46.1538 | James     | Fill         |
+| LANGUAGE DEVELOPMENT                    |      1 |               1 |   100.0000 | Michael   | Brent        |
+| LINEAR ALGEBRA AND DIFFERENTIAL EQNS    |      2 |               3 |    66.6667 | Shih-Ping | Han          |
+| MICROPROCESSOR LAB I                    |      1 |               3 |    33.3333 | Robert    | Glaser       |
+| MIND, BRAIN, COMPUTERS                  |      2 |               3 |    66.6667 | Paul      | Smolensky    |
+| MULTIMEDIA COMPUTING                    |      3 |               5 |    60.0000 | Arthur    | Delcher      |
+| NUMERICAL ANALYSIS                      |      2 |               4 |    50.0000 | Shih-Ping | Han          |
+| PROBABILITY AND STATISTICS              |      1 |               3 |    33.3333 | Lancelot  | James        |
+| PROBABILITY THEORY I                    |      1 |               3 |    33.3333 | James     | Fill         |
+| QUANTITATIVE MEDICAL COMPUTING          |      3 |               5 |    60.0000 | Russell   | Taylor       |
+| RESEARCH SEMINAR IN COGNITIVE PROCESSES |      2 |               2 |   100.0000 | Brenda    | Rapp         |
+| SEMINAR ON COMPUTATIONAL GEOMETRY       |      2 |               2 |   100.0000 | Michael   | Goodrich     |
+| SOUND STRUCTURES IN NATURAL LANGUAGE    |      1 |               3 |    33.3333 | Luigi     | Burzio       |
+| STATISTICAL INFERENCE                   |      0 |               1 |     0.0000 | Cheng     | Cheng        |
+| STOCHASTIC PROCESSES II                 |      2 |               2 |   100.0000 | Lancelot  | James        |
+| SUPERCOMPUTING                          |      8 |              14 |    57.1429 | Arthur    | Delcher      |
+| THE HISTORY OF ROMANCE LANGUAGES        |      1 |               2 |    50.0000 | Luigi     | Burzio       |
+| UNIX SYSTEMS PROGRAMMING                |      1 |               2 |    50.0000 | Louis     | Beach        |
++-----------------------------------------+--------+-----------------+------------+-----------+--------------+
+39 rows in set (0.17 sec)
+
++-------+--------+------+--------+
+| Fname | Lname  | Sex  | Likers |
++-------+--------+------+--------+
+| Jandy | Nelson | F    |     19 |
++-------+--------+------+--------+
+1 row in set (0.01 sec)
+
++-----------------------+-----------------+
+| DName                 | TotalEnrollment |
++-----------------------+-----------------+
+| Cognitive Science     |              18 |
+| ECE                   |              14 |
+| Mathematical Sciences |              45 |
+| Computer Science      |             133 |
++-----------------------+-----------------+
+4 rows in set (0.01 sec)
+
++-------+-----------+
+| Fname | Instances |
++-------+-----------+
+| Eric  |         6 |
++-------+-----------+
+1 row in set (0.01 sec)
+
++-------+-----------------+
+| DName | TotalEnrollment |
++-------+-----------------+
+| ECE   |              14 |
++-------+-----------------+
+1 row in set (0.01 sec)
+
++-------+------+
+| StuID | GPA  |
++-------+------+
+|  1001 | 3.58 |
+|  1002 | 3.38 |
+|  1003 | 3.38 |
+|  1005 | 3.12 |
+|  1015 | 3.57 |
+|  1018 | 3.40 |
+|  1019 | 3.12 |
+|  1022 | 3.38 |
+|  1023 | 3.61 |
+|  1026 | 3.81 |
+|  1033 | 3.86 |
+|  1035 | 3.32 |
++-------+------+
+12 rows in set (0.08 sec)
+
++---------+----------+
+| Fname   | Lname    |
++---------+----------+
+| Linda   | Smith    |
+| Tracy   | Kim      |
+| Shiela  | Jones    |
+| Dinesh  | Kumar    |
+| Paul    | Gompers  |
+| Andy    | Schultz  |
+| Lisa    | Apap     |
+| Eric    | Tai      |
+| Derek   | Lee      |
+| David   | Adams    |
+| Steven  | Davis    |
+| Charles | Norris   |
+| Susan   | Lee      |
+| Mark    | Schwartz |
+| Bruce   | Wilson   |
+| Michael | Leighton |
+| Arthur  | Pang     |
+| Ian     | Thornton |
+| George  | Andreou  |
+| Michael | Woods    |
+| David   | Shieber  |
+| Stacy   | Prater   |
+| Mark    | Goldman  |
+| Eric    | Pang     |
+| Paul    | Brody    |
+| Eric    | Rugh     |
+| Jun     | Han      |
+| Lisa    | Cheng    |
+| Sarah   | Smith    |
++---------+----------+
+29 rows in set (0.01 sec)
+
++-------------------+--------+
+| activity_name     | avgGPA |
++-------------------+--------+
+| Baseball          |   3.10 |
+| Canasta           |   3.20 |
+| Canoeing          |   3.14 |
+| Chess             |   3.29 |
+| Crossword Puzzles |   3.16 |
+| Extreme Canasta   |   3.17 |
+| Football          |   3.27 |
+| Kayaking          |   3.18 |
+| Mountain Climbing |   3.28 |
+| Proselytizing     |   3.00 |
+| Soccer            |   3.18 |
+| Spelunking        |   3.17 |
+| Volleyball        |   3.17 |
++-------------------+--------+
+13 rows in set (10.63 sec)
+
++-----------+--------------+
+| SportName | HoursPerWeek |
++-----------+--------------+
+| Tennis    |            1 |
+| Curling   |           50 |
++-----------+--------------+
+2 rows in set (0.01 sec)
+
++------------+
+| Difference |
++------------+
+|    -8.7083 |
++------------+
+1 row in set (0.00 sec)
+
++------------+
+| Percentage |
++------------+
+|     0.0000 |
++------------+
+1 row in set (0.00 sec)
+
++--------------+--------+
+| numAmenities | gender |
++--------------+--------+
+|            5 | X      |
++--------------+--------+
+1 row in set (0.01 sec)
+
++-----------------------+--------+
+| DName                 | Result |
++-----------------------+--------+
+| ECE                   |      4 |
+| Chemical Engineering  |      1 |
+| Mathematical Sciences |      1 |
+| Computer Science      |      4 |
++-----------------------+--------+
+4 rows in set (0.00 sec)
+
++-------+--------+
+| Fname | Lname  |
++-------+--------+
+| Jandy | Nelson |
++-------+--------+
+1 row in set (0.00 sec)
+
++----------------------------------------+------------+
+| CName                                  | numPlayers |
++----------------------------------------+------------+
+| DATABASE SYSTEMS                       |          4 |
+| INTRODUCTION TO PROBABILITY            |          3 |
+| SUPERCOMPUTING                         |          2 |
+| INTRO TO NATURAL LANGUAGE PROCESSING   |          2 |
+| DISTRIBUTED SYSTEMS                    |          2 |
+| HIGH PERFORMANCE GRAPHICS AND MODELING |          1 |
+| ALGORITHMS I                           |          1 |
+| MULTIMEDIA COMPUTING                   |          1 |
+| DATA STRUCTURES in JAVA                |          1 |
+| APPLIED STATISTICS AND DATA ANALYSIS   |          1 |
+| NUMERICAL ANALYSIS                     |          1 |
+| INTRO TO PROGRAMMING IN JAVA           |          1 |
+| COMBINATORIAL ANALYSIS                 |          1 |
+| PROBABILITY AND STATISTICS             |          1 |
+| COMPUTER SYSTEM FUNDAMENTALS           |          1 |
+| SEMINAR ON COMPUTATIONAL GEOMETRY      |          1 |
+| EXPLORING THE INTERNET                 |          1 |
+| LINEAR ALGEBRA AND DIFFERENTIAL EQNS   |          1 |
+| COMPUTER VISION                        |          1 |
++----------------------------------------+------------+
+19 rows in set (0.02 sec)
+
+MySQL [cs41515_kchang50_db]> notee

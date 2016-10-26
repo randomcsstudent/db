@@ -1,0 +1,559 @@
+1.	SELECT S.fname, S.lname,S.age,S.sex
+	FROM Student S, Lives_in L
+	WHERE L.stuid=S.stuid AND NOT  EXISTS
+                                (SELECT S2.stuid
+                                FROM Student S2,Lives_in L2
+                                WHERE L2.stuid=S2.stuid
+                                        AND S2.stuid<>S.stuid
+                                        AND L2.dormid=L.dormid
+                                        AND L2.room_number=L.room_number);
+
+2.	SELECT  P.fname, P.lname, P.sex
+        	FROM   ((SELECT  S.fname, S.lname, S.sex
+                FROM   Student S, Enrolled_in E, Course C, Department D
+                WHERE  S.stuid=E.stuid AND C.cid=E.cid
+                       AND C.dno=D.dno AND D.dname= 'Computer Science' )
+		 UNION
+                (SELECT F.fname, F.lname, F.sex
+                FROM    Faculty F, Course R, Department T
+                WHERE   R.instructor=F.facid
+                        AND R.dno=T.dno AND T.dname='Computer Science' )) P;
+
+
+3.	SELECT DISTINCT S.fname, S.lname, S.sex, S.major
+ 	 FROM Student S
+ 	 WHERE S.stuid = (SELECT L.wholikes
+                   FROM Likes L
+                   GROUP BY L.wholikes
+                   HAVING count(L.whoisliked) = (SELECT count(stuid)
+                                                 FROM Student));
+
+4.	SELECT S.fname, S.lname, S.age, S.major, sum(C.credits) as numbercredits
+     	 FROM Student S, Enrolled_in E, Course C
+   	 WHERE S.stuid = E.stuid and C.cid = E.cid
+    	GROUP BY S.fname, S.lname, S.major, S.age;
+
+5.	SELECT S.fname, S.lname, S.major
+  	 FROM Student S, Enrolled_in E, Course C
+   	WHERE S.stuid = E.stuid AND C.cid = E.cid
+   	GROUP BY S.fname, S.lname, S.major
+   	HAVING sum(C.credits) > 20;
+
+
+6.	SELECT  distinct f.fname||' '||f.lname Faculty_Name
+  	FROM Student s1, Student s2, Faculty f, Enrolled_in ei
+ 	WHERE s1.advisor = f.facid
+    	AND s1.stuid = ei.stuid
+      	AND s2.stuid IN (
+                       SELECT stuid
+                       FROM Enrolled_in
+                       WHERE cid = ei.cid
+                         AND stuid != s1.stuid
+                     )
+     	AND s2.stuid IN (
+                      SELECT l1.stuid
+                      FROM lives_in l1, lives_in l2,
+                           Student s, Minor_in mi, member_of mo
+                      WHERE l1.stuid < l2.stuid
+                        AND l1.dormid = l2.dormid
+                        AND l1.room_number = l2.room_number
+                        AND s.stuid = l2.stuid
+                        AND mi.stuid = l2.stuid
+                        AND ( s.major IN (
+                                           SELECT dno
+                                           FROM member_of
+                                           WHERE facid = f.facid
+                                          )
+                              or
+                              mi.dno IN  (
+                                           SELECT dno
+                                           FROM member_of
+                                           WHERE facid = f.facid
+                                         )
+                            )
+                     );
+
+7.	SELECT temp1.fname,temp1.lname
+ 	 FROM
+       	 (
+       	     SELECT s1.fname,s1.lname,s1.major,COUNT(s2.stuid) ans
+            FROM student s1,student s2
+            WHERE (s1.stuid,s2.stuid)
+            IN
+                (
+                        SELECT wholikes,whoisliked
+                        FROM likes
+                )
+                and s1.major = s2.major and s1.stuid <> s2.stuid
+            GROUP BY s1.stuid,s1.fname,s1.lname,s1.major
+        )temp1,
+        (
+                SELECT s3.major,COUNT(s3.stuid) ans
+                FROM student s3
+                GROUP BY s3.major
+        )temp2
+ 	 WHERE temp1.major=temp2.major and temp1.ans=temp2.ans-1;
+
+
+
+8.	SELECT dname,total
+  	FROM department d,
+                (
+                 SELECT dep,SUM(cnt) total
+                 FROM
+                 (
+                        SELECT c.dno dep,(k.ans * c.credits) cnt
+                        FROM course c,
+                        (
+                                SELECT cid,COUNT(stuid) ans
+                                FROM enrolled_in GROUP BY cid
+                        )k
+                        WHERE c.cid = k.cid
+                )GROUP BY dep
+	)res WHERE d.dno=res.dep;
+
+
+
+9.	SELECT R.fname, R.lname, R.age
+	FROM Student R
+	WHERE R.stuid NOT IN ( SELECT S.stuid
+                       FROM  Student S, Student T
+                       WHERE S.age<T.age AND S.major=T.major);
+
+
+10.
+    select EI.CID,CName,BelowB,EnrolledCount,
+           BOrBelow*1.0/EnrolledCount*100 as PercentBOrBelow,
+           Fname,Lname
+    from (select CID,count(if(gradepoint < 3,1,NULL)) BelowB,
+                     count(if(gradepoint <= 3,1,NULL)) BOrBelow,
+                     count(*) EnrolledCount
+          from (select CID,CourseGrades.Grade,gradepoint
+                from (select CID,Grade from Enrolled_in) as CourseGrades
+                join Gradeconversion GC
+                on CourseGrades.Grade=GC.lettergrade) as G
+          group by CID) EI,Course C,Faculty F
+    where EI.CID=C.CID and C.Instructor=F.FacID;
+
+
+11.	SELECT s1.stuid, s1.fname , s1.lname , s2.stuid, s2.fname , s2.lname
+ 	  FROM student s1 , student s2
+ 	  WHERE (s1.stuid,s2.stuid)
+ 	  IN
+      	  (
+                SELECT a.wholoves,a.whoisloved
+                FROM loves a,loves b
+                WHERE a.wholoves=b.whoisloved and a.whoisloved=b.wholoves and a.wholoves 	!= a.whoisloved and a.wholoves < a.whoisloved );
+
+
+
+12.	SELECT S1.fname, S1.lname, S1.sex, S2.fname, S2.lname, S2.sex
+	FROM   Student S1, Student S2, Loves L1, Loves L2, Lives_in V1,Lives_in V2
+	WHERE  L1.wholoves=S1.stuid AND L1.whoisloved=S2.stuid
+   	    AND L2.wholoves=S2.stuid AND L2.whoisloved=S1.stuid
+    	   AND S1.stuid<S2.stuid
+     	  AND V1.stuid=S1.stuid AND V2.stuid=S2.stuid
+     	  AND V1.dormid=V2.dormid
+    	    AND V1.room_number=V2.room_number;
+
+13.	SELECT S1.fname, S1.lname
+	FROM Student S1
+	WHERE S1.stuid IN
+                           (SELECT L1.wholoves
+                                FROM Loves L1
+                                WHERE NOT EXISTS
+	 (SELECT *FROM Loves L2
+           WHERE L2.wholoves=L1.whoisloved AND L2.whoisloved=L1.wholoves));
+
+
+14.	
+
+    SELECT S3.Fname as LoverFname, S3.Lname as LoverLname,
+           S1.Fname as Roomie1Fname, S1.Lname as Roomie1Lname,
+           S2.Fname as Roomie2Fname, S2.Lname as Roomie2Lname
+    FROM (select *
+          from (select distinct L1.StuID Roomie1,L2.StuID Roomie2
+                from Lives_in L1,Lives_in L2
+                where L1.dormid=L2.dormid
+                      and L1.room_number=L2.room_number
+                      and L1.StuID < L2.StuID) as Roomies
+          join (select Lov1.WhoLoves,Lov1.WhoIsLoved Love1,Lov2.WhoIsLoved Love2
+                from Loves as Lov1,Loves as Lov2
+                where Lov1.WhoLoves=Lov2.WhoLoves
+                      and Lov1.WhoIsLoved < Lov2.WhoIsLoved) as LovePairs
+          on Roomies.Roomie1=LovePairs.Love1
+             and Roomies.Roomie2=LovePairs.Love2) as ThirdPartyLove,
+        Student S1,Student S2,Student S3
+    WHERE S1.StuID=Roomie1 and S2.StuID=Roomie2 and S3.StuID=WhoLoves;
+    
+
+15.    SELECT T4.fname,T4.lname,T4.advisor,T4.credits
+        FROM
+        (SELECT S1.major AS major, AVG(T1.credits) AS avgcredits
+        FROM (SELECT E1.stuid AS stuid, SUM (C1.credits) AS credits
+        FROM Enrolled_in E1,Course C1
+        WHERE E1.Cid=C1.cid
+        GROUP BY E1.stuid)T1,
+        Student S1
+        WHERE S1.stuid=T1.stuid
+        GROUP BY S1.major) T3,
+        (SELECT S2.stuid As stuid,
+        S2.lname As lname,
+        S2.fname AS fname,
+        S2.advisor AS advisor,
+        S2.major AS major,
+        T2.credits AS credits
+        FROM (SELECT E1.stuid AS stuid, SUM (C1.credits) AS credits
+        FROM Enrolled_in E1,Course C1
+        WHERE E1.Cid=C1.cid
+        GROUP BY E1.stuid)T2,
+        Student S2
+        WHERE S2.stuid=T2.stuid)T4
+        WHERE T3.major=T4.major AND T4.credits>T3.avgcredits;
+OR
+    select StuID,Student,Advisor,AdvName,CreditsEnrolled,SInfo.Major,AvgCreditsEnrolled
+    from (select S.StuID,concat(S.Fname," ",S.Lname) as Student,Major,
+                 Advisor,concat(F.Fname," ",F.Lname) as AdvName,
+                 sum(Credits) as CreditsEnrolled
+          from Enrolled_in E,Course C,Student S,Faculty F
+          where E.StuID=S.StuID and E.CID=C.CID and S.Advisor=F.FacID
+          group by StuID) as SInfo
+    join (select Major,avg(CreditsEnrolled) AvgCreditsEnrolled
+          from (select Major,sum(Credits) as CreditsEnrolled
+                from Enrolled_in E,Course C,Student S,Faculty F
+                where E.StuID=S.StuID and E.CID=C.CID and S.Advisor=F.FacID
+                group by S.StuID) as CredByMajor
+          group by Major) as AvgCredits
+    on SInfo.Major=AvgCredits.Major
+    where CreditsEnrolled > AvgCreditsEnrolled;
+    
+
+
+
+16.    SELECT S.fname,S.lname
+        FROM Student S
+        WHERE S.stuid IN
+       (SELECT T1.stuid
+        FROM
+        (SELECT L1.whoisliked AS stuid,COUNT (*) AS likednum
+        FROM Likes L1
+        GROUP BY L1.whoisliked)T1
+        WHERE T1.likednum=(SELECT MAX (T2.likednum)
+        FROM (SELECT L1.whoisliked AS stuid,COUNT (*) AS likednum
+                                                        FROM Likes L1
+                GROUP BY L1.whoisliked)T2));
+
+    OR
+      select WhoIsLiked,concat(Fname," ",Lname) Name,HowManyLikeThem
+      from (select *
+            from (select WhoIsLiked,count(*) HowManyLikeThem
+                  from Likes
+                  group by WhoIsLiked) as Likable
+            where HowManyLikeThem in (select max(HowManyLikeThem) mHM
+                                      from (select WhoIsLiked,count(*) HowManyLikeThem
+                                            from Likes
+                                            group by WhoIsLiked) as Likable
+                                      )
+            ) as MaxLiked,Student S
+      where MaxLiked.WhoIsLiked=S.StuID;
+      
+
+
+17.	SELECT S2.fname,S2.lname,T2.likedorlovednum AS likedorlovednum
+	FROM
+	(SELECT S1.stuid AS stuid,S1.stuid-S1.stuid AS likedorlovednum
+	FROM Student S1
+	WHERE (NOT EXISTS (SELECT *
+                                        FROM Likes LI1
+                                        WHERE LI1.whoisliked=S1.stuid))
+                AND
+                (NOT EXISTS (SELECT *FROM Loves LO1 WHERE LO1.whoisloved=S1.stuid))
+	UNION
+	SELECT T1.whoislikedorloved AS stuid,COUNT(*) AS likedorlovednum
+	FROM
+	(SELECT LI2.wholikes AS wholikesorloves, LI2.whoisliked AS whoislikedorloved
+	FROM Likes LI2
+	UNION
+	SELECT LO2.wholoves AS wholikesorloves,LO2.whoisloved AS whoislikedorloved
+	FROM Loves LO2)T1
+	GROUP BY T1.whoislikedorloved) T2,
+	Student S2
+	WHERE S2.stuid=T2.stuid
+	ORDER BY likedorlovednum DESC;
+
+18.	SELECT S1.fname,S1.lname,S1.age
+	FROM Student S1
+	WHERE S1.age>(SELECT AVG(S2.age)
+         FROM Student S2);
+
+19.
+SELECT d.division, Sum(Enrollment.result)
+FROM Department d,
+        (SELECT c.dno AS department, COUNT(e.stuid) AS result
+        FROM Course c, Enrolled_in e WHERE c.cid = e.cid GROUP BY(c.dno)) AS Enrollment
+WHERE (d.dno = Enrollment.department) GROUP BY (d.division);
+
+20.
+SELECT result2.fname,Max(result2.count)
+FROM
+        (SELECT result.fname AS fname, COUNT(result.fname) AS count FROM
+                (SELECT * FROM Faculty UNION SELECT * FROM Student) AS result
+        GROUP BY (result.fname) ORDER BY count DESC) AS result2;
+
+21.
+SELECT d.dname, result.department, MIN(result.count) FROM Department d,
+        (SELECT c.dno AS department,COUNT(e.stuid) AS count
+        FROM Course c, Enrolled_in e WHERE c.cid = e.cid GROUP BY(c.dno)) AS result
+WHERE result.department = d.dno GROUP BY result.count ASC LIMIT 1;
+
+22.
+SELECT student1.fname,student1.lname,student1.stuid,student2.fname,student2.lname,student2.stuid FROM Student student1, Student student2,
+        (SELECT DISTINCT s.stuid AS stu1, s2.stuid AS stu2 FROM
+                (SELECT DISTINCT p.stuid,p.gameid,e.cid FROM Plays_Games p, Enrolled_in e WHERE (e.cid IN (SELECT cid FROM Course WHERE instructor = (SELECT facid FROM Faculty WHERE fname = 'Yair' AND lname = 'Amir')))
+                        AND (e.stuid = p.stuid)) AS s,
+                (SELECT DISTINCT p.stuid,p.gameid,e.cid FROM Plays_Games p, Enrolled_in e WHERE (e.cid IN (SELECT cid FROM Course WHERE instructor = (SELECT facid FROM Faculty WHERE fname = 'Yair' AND lname = 'Amir')))
+                        AND (e.stuid = p.stuid)) AS s2
+        WHERE s.cid <> s2.cid AND s.cid < s2.cid AND s.stuid NOT IN (SELECT stuid FROM Plays_Games WHERE gameid IN (SELECT gameid FROM Plays_Games where stuid = s2.stuid))
+    ) AS result
+WHERE result.stu1 = student1.stuid AND result.stu2 = student2.stuid;
+
+23.
+SELECT s.fname,s.lname,s.stuid,sportsgpa.gpa + 0.1 AS GPA FROM Student s,
+(
+        SELECT forgpa2.stuid,TRUNCATE(forgpa2.points/forgpa2.credits,2) as gpa FROM
+                (SELECT SUM(forgpa.gradepoint * forgpa.credits) AS points, SUM(forgpa.credits) AS credits, forgpa.stuid AS stuid FROM
+                        (SELECT g.gradepoint,e.grade,c.credits,e.stuid,e.cid FROM Course c,Gradeconversion g, Enrolled_in e
+                        WHERE e.stuid IN (SELECT stuid FROM Student) AND(e.grade = g.lettergrade)AND(c.cid = e.cid))
+                AS forgpa GROUP BY(stuid)) AS forgpa2
+    ) AS sportsgpa
+WHERE sportsgpa.stuid IN (SELECT stuid FROM SportsInfo) AND s.stuid = sportsgpa.stuid
+UNION
+SELECT s.fname,s.lname,s.stuid,sportsgpa.gpa AS GPA FROM Student s,
+        (SELECT forgpa2.stuid,TRUNCATE(forgpa2.points/forgpa2.credits,2) as gpa FROM
+                (SELECT SUM(forgpa.gradepoint * forgpa.credits) AS points, SUM(forgpa.credits) AS credits, forgpa.stuid AS stuid FROM
+                        (SELECT g.gradepoint,e.grade,c.credits,e.stuid,e.cid FROM Course c,Gradeconversion g, Enrolled_in e
+                        WHERE e.stuid IN (SELECT stuid FROM Student) AND(e.grade = g.lettergrade)AND(c.cid = e.cid))
+                AS forgpa GROUP BY(stuid)) AS forgpa2)
+        AS sportsgpa
+WHERE sportsgpa.stuid NOT IN (SELECT stuid FROM SportsInfo) AND s.stuid = sportsgpa.stuid
+;
+
+24.
+SELECT s.stuid,s.fname,s.lname, COUNT(e.cid) FROM Enrolled_in e, Student s
+        WHERE e.stuid IN (SELECT stuid FROM Has_Allergy
+                WHERE allergy IN (SELECT allergy FROM Allergy_Type WHERE allergytype = 'FOOD'))
+        AND e.stuid = s.stuid
+    GROUP BY e.stuid HAVING COUNT(e.cid)>3;
+
+25.
+SELECT sports.sportname,TRUNCATE(SUM(sportsgpa.sportgpa)/COUNT(sports.stuid),2) AS AverageGPA FROM
+    (SELECT forgpa2.stuid,TRUNCATE(forgpa2.points/forgpa2.credits,2) as sportgpa FROM
+                (SELECT SUM(forgpa.gradepoint * forgpa.credits) AS points, SUM(forgpa.credits) AS credits, forgpa.stuid AS stuid FROM
+                        (SELECT g.gradepoint,e.grade,c.credits,e.stuid,e.cid FROM Course c,Gradeconversion g, Enrolled_in e
+                        WHERE e.stuid IN (SELECT stuid FROM Student) AND(e.grade = g.lettergrade)AND(c.cid = e.cid))
+                AS forgpa GROUP BY(stuid)) AS forgpa2) AS sportsgpa, SportsInfo sports WHERE sports.stuid = sportsgpa.stuid
+        GROUP BY (sports.sportname);
+
+26.
+SELECT *
+        FROM ((SELECT SI.SportName, sum(SI.HoursPerWeek) as sum_hours
+               FROM SportsInfo as SI
+               GROUP BY SI.SportName
+               HAVING sum(SI.HoursPerWeek) >= all (SELECT sum(HoursPerWeek)
+                                                   FROM SportsInfo
+                                                   GROUP BY SportName))
+               UNION
+
+              (SELECT SI.SportName, sum(SI.HoursPerWeek) as sum_hours
+               FROM SportsInfo as SI
+               GROUP BY SI.SportName
+               HAVING sum(SI.HoursPerWeek) <= all (SELECT sum(HoursPerWeek)
+                                                   FROM SportsInfo
+                                                   GROUP BY SportName)))A;
+                                                   
+27.
+ SELECT Scholarship-NoScholarship
+	FROM (SELECT AVG(GamesPlayed) NoScholarship
+		FROM SportsInfo
+		WHERE OnScholarship = "N") NoScholar,
+		(SELECT AVG(GamesPlayed) Scholarship
+		FROM SportsInfo
+		WHERE OnScholarship = "Y") Scholar;
+
+
+28.
+select Department.DName
+	   , COUNT(a.StuID) as num
+	   , AVG(a.GPA) as GPA
+from (
+select Student.StuID
+	   , Student.Major
+	   , AVG(Gradeconversion.gradepoint) as GPA
+from Student
+	 , SportsInfo
+	 , Enrolled_in
+	 , Gradeconversion
+where Student.StuID = SportsInfo.StuID
+	  and Student.StuID = Enrolled_in.StuID
+	  and Enrolled_in.Grade = Gradeconversion.lettergrade
+group by Student.StuID, Student.Major) a
+	, Department
+where a.Major = Department.DNO
+group by Department.DName;
+
+29.
+SELECT Early_riser_athletes.num / Early_risers.num * 100 AS percentage
+FROM (SELECT count(DISTINCT S.stuid) AS num
+    FROM Student S, Preferences P
+    WHERE S.stuid = P.stuid
+        AND P.sleephabits = "EarlyRiser"
+        AND S.stuid IN (SELECT stuid
+            FROM SportsInfo SI
+            GROUP BY SI.stuid))
+   AS Early_riser_athletes,
+   (SELECT count(DISTINCT S.stuid) AS num
+    FROM Student S, Preferences P
+    WHERE S.stuid = P.stuid
+        AND P.sleephabits = "EarlyRiser")
+   AS Early_risers;
+                 
+ 
+30.
+SELECT D.dormid, D.dorm_name, D.Gender, count(distinct(H.amenid)) as num_amenities
+        FROM SportsInfo as S, Dorm as D, Lives_in as L, Has_amenity as H
+        WHERE S.StuID = L.StuID and L.dormid = D.dormid and D.dormid = H.dormid
+        GROUP BY D.dormid
+        HAVING count(distinct(S.StuID)) >= all (SELECT count(distinct(S.StuID))
+                                                FROM SportsInfo as S, Dorm as D, Lives_in as L
+                                                WHERE S.StuID = L.StuID and L.dormid = D.dormid
+                                                GROUP BY D.dormid);
+                                                
+31.
+SELECT COUNT(Student.StuID) as NumWomen
+	FROM Student
+	WHERE StuID in (SELECT StuID
+			FROM SportsInfo
+			WHERE SportName = "Basketball"
+			or SportName = "Tennis")
+	and Sex = "F"
+	and StuID in (SELECT StuID 
+			FROM Preferences
+			WHERE MusicType = "StudiesWith");
+			
+32.
+SELECT D.Dname, count(distinct(S.StuID)) as count
+        FROM Department as D, Student as S, Preferences as P, Has_Allergy as H
+        WHERE D.DNO = S.Major and S.StuID = P.StuID and S.StuID = H.StuID 
+              and P.Smoking = 'Yes' and S.StuID not in (SELECT StuID 
+                                                        FROM SportsInfo)
+														GROUP BY D.Dname;
+
+33.
+select Student.Fname
+	   , Student.LName
+	   , SUM(t.timecost) as timecost
+from 
+(
+select Enrolled_in.StuID as StuID
+	   , COUNT(Enrolled_in.CID)*10 as timecost
+from Enrolled_in
+group by Enrolled_in.StuID
+
+union all
+
+select SportsInfo.StuID as StuID
+	   , SUM(SportsInfo.HoursPerWeek) as timecost
+from SportsInfo
+group by SportsInfo.StuID
+) t, Student
+where t.StuID = Student.StuID
+group by t.StuID
+order by SUM(t.timecost) DESC
+limit 1
+
+34.
+select Student.Fname
+	   , Student.LName
+from (
+select Likes.WhoIsLiked as StuID
+	   , COUNT(Likes.WhoLikes) as num
+from Likes
+group by Likes.WhoIsLiked
+order by COUNT(Likes.WhoLikes) DESC
+limit 1) t, Student
+where t.StuID = Student.StuID
+
+35.
+SELECT DISTINCT CName
+	FROM Course, (SELECT CID, COUNT(StuID) NumStudents
+			FROM Enrolled_in
+			WHERE StuID in (SELECT StuID
+					FROM Plays_Games
+					GROUP BY StuID
+					HAVING SUM(Hours_Played) >= 50)
+			GROUP BY CID) StudentGamers
+	WHERE StudentGamers.CID = Course.CID
+	ORDER BY NumStudents DESC;
+	
+36.
+SELECT DISTINCT dorm_name
+	FROM Dorm, (SELECT stuid, dormid
+			FROM Lives_in
+			WHERE stuid in (SELECT StuID
+				FROM Plays_Games
+				WHERE GameID in (SELECT GameID
+						FROM Video_Games
+						WHERE GName != "Europe is the Universe"))) Gamers
+	WHERE Dorm.dormid = Gamers.dormid;
+
+37.
+SELECT SUM(GameHours)
+FROM Student S, Preferences P, (SELECT StuID, SUM(Hours_Played) GameHours
+						FROM Plays_Games
+						GROUP BY StuID) Gamers
+WHERE S.StuID = Gamers.StuID
+and S.StuID = P.StuID
+and P.Smoking = "no"
+and S.StuID in (SELECT WhoLikes
+		FROM Likes);
+
+38.
+SELECT fname, lname
+FROM Student
+WHERE EXISTS (
+	SELECT *
+	FROM Enrolled_in, Course, Department, Gradeconversion
+	WHERE Student.stuid=Enrolled_in.stuid AND Enrolled_in.grade=Gradeconversion.lettergrade
+	AND Gradeconversion.gradepoint>=4.0 AND Enrolled_in.cid=Course.cid
+	AND Course.dno=Department.dno AND Department.dname='Computer Science') AND NOT EXISTS (
+	SELECT *
+	FROM Plays_Games
+	WHERE Plays_Games.stuid=Student.stuid);
+	
+39.
+SELECT AVG(S1. Hours_Played) FROM
+   (SELECT P.Hours_Played, L.dormid
+    FROM Student as St, Plays_Games as P, Lives_in as L
+    WHERE St.StuID NOT IN (SELECT StuID FROM Participates_in)
+    AND St.StuID = P.StuID AND St.StuID = L.StuID) AS S1,
+   (SELECT P.Hours_Played, L.dormid
+    FROM Student as St, Plays_Games as P, Lives_in as L
+    WHERE St.StuID NOT IN (SELECT StuID FROM Participates_in)
+    AND St.StuID = P.StuID AND St.StuID = L.StuID) AS S2
+WHERE S1.dormid != S2.dormid;
+
+40.
+select a.StuID
+	   , b.StuID
+	   , c.StuID
+from Student a
+	 , Student b
+	 , Student c
+where exists(select * from Loves where a.StuID = Loves.WhoLoves and b.StuID = Loves.WhoIsLoved)
+      and exists(select * from Loves where b.StuID = Loves.WhoLoves and c.StuID = Loves.WhoIsLoved)
+      and exists(select * from Loves where c.StuID = Loves.WhoLoves and a.StuID = Loves.WhoIsLoved)
+      and not exists (select * from Loves where b.StuID = Loves.WhoLoves and a.StuID = Loves.WhoIsLoved)
+      and not exists (select * from Loves where c.StuID = Loves.WhoLoves and b.StuID = Loves.WhoIsLoved)
+      and not exists (select * from Loves where a.StuID = Loves.WhoLoves and c.StuID = Loves.WhoIsLoved)
+      and a.StuID < b.StuID
+      and b.StuID < c.StuID

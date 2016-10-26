@@ -1,0 +1,142 @@
+/* View for JUST total points */
+
+DELIMITER //
+CREATE VIEW TotalPoints AS 
+SELECT HW1, HW2a, HW2b, Midterm, HW3, FExam
+FROM Rawscores R
+WHERE R.ssn = 0001;
+//
+DELIMITER ;
+
+/* View for JUST the weights */
+
+DELIMITER //
+CREATE VIEW Weights AS 
+SELECT HW1, HW2a, HW2b, Midterm, HW3, FExam
+FROM Rawscores R
+WHERE R.ssn = 0002;
+//
+DELIMITER ;
+
+/* View for WtdPts, to use in (b) */
+
+DELIMITER //
+CREATE VIEW WtdPts AS 
+SELECT (W.HW1/T.HW1) as HW1, 
+    (W.HW2a/T.HW2a) as HW2a,
+    (W.HW2b/T.HW2b) as HW2b,
+    (W.Midterm/T.Midterm) as Midterm,
+    (W.HW3/T.HW3) as HW3,
+    (W.FExam/T.FExam) as FExam
+FROM Weights W, TotalPoints T
+//
+DELIMITER ;
+
+/* (a) */
+
+DELIMITER //
+
+CREATE PROCEDURE ShowRawScores (IN ssn INT)
+BEGIN IF EXISTS
+    (SELECT R.ssn FROM Rawscores R WHERE R.ssn = ssn) THEN
+SELECT * 
+FROM Rawscores R
+WHERE R.ssn = ssn AND R.ssn != 0001 AND R.ssn != 0002; ELSE
+    (SELECT 'SSN Not Found' AS 'Error Message'; END IF;
+END//
+
+delimiter ;
+
+/*CALL ShowRawScores(9176)*/
+
+/* (b) */
+
+DELIMITER //
+
+CREATE PROCEDURE ShowPercentages (IN ssn INT)
+BEGIN IF EXISTS
+    (SELECT R.ssn FROM Rawscores R WHERE R.ssn = ssn) THEN
+SELECT R.SSN,
+    R.LName,
+    R.FName,
+    R.Section,
+    (R.HW1 / T.HW1) * 100 as HW1,
+    (R.HW2a / T.HW2a) * 100 as HW2a,
+    (R.HW2b / T.HW2b) * 100 as HW2b,
+    (R.Midterm / T.Midterm) * 100 as Midterm,
+    (R.HW3 / T.HW3) * 100 as HW3,
+    (R.FExam / T.FExam) * 100 as FExam
+FROM Rawscores R, TotalPoints T
+WHERE R.ssn = ssn; 
+    SELECT Concat('The cumulative course average for ', R3.FName, ' ', R3.Lname, ' is ', T2.FinalAvg) AS Result
+    FROM (
+        SELECT (R2.HW1*W.HW1 + R2.HW2a*W.HW2a + R2.HW2b*W.HW2b + R2.HW3*W.HW3 + R2.Midterm*W.Midterm + R2.FExam*W.FExam)*100 as FinalAvg, R.ssn
+        FROM Rawscores R2, WtdPts W
+        WHERE R2.ssn != 0001 AND R2.ssn != 0002) AS T2, Rawscores R3
+    WHERE T2.ssn = R3.ssn AND R3.ssn = ssn; 
+ELSE
+    SELECT 'SSN Not Found' AS 'Error Message'; END IF;
+END//
+    
+delimiter ; 
+
+/* (c) */
+
+DELIMITER //
+
+CREATE PROCEDURE AllRawScores (IN pass VARCHAR(256))
+BEGIN IF EXISTS 
+    (SELECT * FROM Passwords P WHERE P.CurPasswords=pass) THEN
+SELECT * 
+FROM Rawscores R
+WHERE R.ssn != 0001 AND R.ssn != 0002
+ORDER BY R.Section, R.LName, R.FName; ELSE 
+    SELECT 'Incorrect Password' AS 'Error Message'; END IF;
+END//
+
+delimiter ;
+
+/* (d) */
+
+DELIMITER //
+
+CREATE PROCEDURE AllPercentages (IN pass VARCHAR(256))
+BEGIN IF EXISTS 
+    (SELECT * FROM Passwords P WHERE P.CurPasswords=pass) THEN
+SELECT R.SSN,
+    R.LName,
+    R.FName,
+    R.Section,
+    (R.HW1 / T.HW1) * 100 as HW1,
+    (R.HW2a / T.HW2a) * 100 as HW2a,
+    (R.HW2b / T.HW2b) * 100 as HW2b,
+    (R.Midterm / T.Midterm) * 100 as Midterm,
+    (R.HW3 / T.HW3) * 100 as HW3,
+    (R.FExam / T.FExam) * 100 as FExam, 
+    T2.FinalAvg as CumulativeAverage
+FROM Rawscores R, TotalPoints T, 
+    (SELECT (R2.HW1*W.HW1 + R2.HW2a*W.HW2a + R2.HW2b*W.HW2b + R2.HW3*W.HW3 + R2.Midterm*W.Midterm + R2.FExam*W.FExam)*100 as FinalAvg, R2.ssn
+    FROM Rawscores R2, WtdPts W
+    WHERE R2.ssn != 0001 AND R2.ssn != 0002) as T2
+WHERE R.ssn = T2.ssn
+ORDER BY R.Section, T2.FinalAvg; ELSE
+    SELECT 'Incorrect Password' AS 'Error Message'; END IF;
+END//
+
+Delimiter ;
+
+/* (g) */
+Delimiter //
+DROP PROCEDURE IF EXISTS UpdateMidterm //
+CREATE PROCEDURE UpdateMidterm (IN password VarChar(255), IN ssn varchar(4), IN grade INT) BEGIN IF EXISTS
+    (Select * FROM PASSWORDS P WHERE BINARY P.CurPasswords = password) THEN IF EXISTS
+    (SELECT * FROM Rawscores r WHERE r.ssn = ssn) THEN
+    UPDATE Rawscores R 
+    SET R.Midterm = grade 
+    WHERE R.ssn = ssn; 
+  SELECT 'Updated' AS 'MESSAGE'; ELSE
+  SELECT 'Update failed - wrong ssn' AS 'MESSAGE'; END IF; ELSE
+  SELECT 'Update failed - invalid password' AS 'MESSAGE'; END IF; END//
+
+DELIMITER ;
+    
